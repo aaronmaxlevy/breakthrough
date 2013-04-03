@@ -1,10 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class Breakthrough extends JFrame {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	static JButton [][] buttons = new JButton[8][8]; 
 	static int counter = 0;
 	static String buttonPressed, buttonValue;
@@ -85,6 +87,10 @@ public class Breakthrough extends JFrame {
 }
 
 class Button extends JButton implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	int x, y;
 
 	public Button(int row, int col) {
