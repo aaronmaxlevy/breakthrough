@@ -20,7 +20,7 @@ public class Breakthrough extends JFrame implements ActionListener {
       p2 = 0; 
 		playerTurn = 1; 
 		
-		//JOptionPane.showMessageDialog(null, "Welcome! \nPlayer 1's units are unicorns. \nPlayer 2's units are dragons.");
+		//old idea JOptionPane.showMessageDialog(null, "Welcome! \nPlayer 1's units are unicorns. \nPlayer 2's units are dragons.");
 		
       northPanel();
       centerPanel();
