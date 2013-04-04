@@ -3,9 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class Breakthrough extends JFrame implements ActionListener {
-   /**
-	 * random comment
-	 */
+
 	private static final long serialVersionUID = 1L;
 	JButton [][] buttons = new JButton[8][8]; 
    int counter, p1, p2, playerTurn;
