@@ -2,197 +2,277 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Breakthrough extends JFrame {
-	/**
+public class Breakthrough extends JFrame implements ActionListener {
+   /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	static JButton [][] buttons = new JButton[8][8]; 
-	static int counter = 0;
-	static String buttonPressed, buttonValue;
-	JPanel north, center, south;
-	JLabel playerTurn, p1Score, p2Score;
-	JMenuBar menuBar;
-	JMenu file;
-	JMenuItem newGame;
-	
-	public Breakthrough() {		
-		northPanel();
-		centerPanel();
-		southPanel();
-		createMenu();
+JButton [][] buttons = new JButton[8][8]; 
+   int counter, p1, p2, playerTurn;
+   String buttonPressed, buttonValue;
+   JPanel north, center, south;
+   JLabel player, p1Score, p2Score;
+   JMenuBar menuBar;
+   JMenu file, help;
+   JMenuItem newGame, rules;
+   
+   public Breakthrough() { 
+      counter = 0;
+      p1 = 0;
+      p2 = 0; 
+		playerTurn = 1; 
 		
-		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		pack();
-		setResizable(false);	
-		setLocationRelativeTo(null);
-	
-	}
-	
-	public void northPanel() {
-		north = new JPanel();
-		playerTurn = new JLabel("Player 1's Turn");
-		north.add(playerTurn);
-		add(north, BorderLayout.NORTH);
-	}
-	
-	public void centerPanel()	{
-		center = new JPanel(new GridLayout(8, 8));
-		//setLayout(new GridLayout(8, 8));
+		//JOptionPane.showMessageDialog(null, "Welcome! \nPlayer 1's units are unicorns. \nPlayer 2's units are dragons.");
 		
-		for(int col = 0; col < 8; col++)
-		{
-			for(int row = 0; row < 8; row++)
-			{
-				
-				buttons[row][col] = new Button(row, col);
-				center.add(buttons[row][col]);		
+      northPanel();
+      centerPanel();
+      southPanel();
+      createMenu();
+      
+		setTitle("Best Game Ever");
+      setVisible(true);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      pack();
+      setResizable(false); 
+      setLocationRelativeTo(null);
+   
+   }
+   
+   public void northPanel() {
+      north = new JPanel();
+      player = new JLabel("Player 1's Turn");
+      north.add(player);
+      add(north, BorderLayout.NORTH);
+   }
+   
+   public void centerPanel()  {
+      center = new JPanel(new GridLayout(8, 8));
+      //setLayout(new GridLayout(8, 8));
+      
+      for(int col = 0; col < 8; col++)
+      {
+         for(int row = 0; row < 8; row++)
+         {
+            
+            buttons[row][col] = new Button(row, col);
+            center.add(buttons[row][col]);      
 
-			}
+         }
+      }
+      
+      add(center, BorderLayout.CENTER);
+   }
+   
+   public void southPanel() {
+      south = new JPanel();
+		
+      p1Score = new JLabel("Player 1: " + p1);
+      p2Score = new JLabel("Player 2: " + p2);
+      
+      south.add(p1Score);
+      south.add(p2Score);
+      
+      add(south, BorderLayout.SOUTH);
+      
+   }
+   
+   public void createMenu() {
+      menuBar = new JMenuBar();
+		
+      file = new JMenu("File");
+		help = new JMenu("Help");
+		
+      newGame = new JMenuItem("New Game");
+		rules = new JMenuItem("Rules");
+      
+      file.add(newGame);
+		help.add(rules);
+		
+      menuBar.add(file);
+		menuBar.add(help);
+      
+      file.setMnemonic('F');
+      newGame.setMnemonic('N');
+      
+      setJMenuBar(menuBar);
+		
+		newGame.addActionListener(this);
+		rules.addActionListener(this);
+   }
+   
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == rules) {
+			JOptionPane.showMessageDialog(null, "Rules: \n1. You are able to move diagonally forward by one unit space \n2. You are able to move horizontally forward by one unit space \n3. You may only capture an enemy unit if it is located diagonally forward \n4. You cannot move vertically or backwards \n5. Player with most captured units wins");
 		}
-		
-		add(center, BorderLayout.CENTER);
+		else if (ae.getSource() == newGame) {
+		}
 	}
 	
-	public void southPanel() {
-		south = new JPanel();
-		p1Score = new JLabel("Player 1: 1");
-		p2Score = new JLabel("Player 2: 0");
-		
-		south.add(p1Score);
-		south.add(p2Score);
-		
-		add(south, BorderLayout.SOUTH);
-		
-	}
-	
-	public void createMenu() {
-		menuBar = new JMenuBar();
-		file = new JMenu("File");
-		newGame = new JMenuItem("New Game");
-		
-		file.add(newGame);
-		menuBar.add(file);
-		
-		file.setMnemonic('F');
-		newGame.setMnemonic('N');
-		
-		setJMenuBar(menuBar);
-	}
-	
-	public static void main(String [] args) {
-		new Breakthrough();
-	}
-}
+   public static void main(String [] args) {
+      new Breakthrough();
+   }
 
-class Button extends JButton implements ActionListener {
-	/**
+   class Button extends JButton implements ActionListener {
+      /**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 	int x, y;
-
-	public Button(int row, int col) {
-		x = row;
-		y = col;
-		assignButtonValue();
-		setCoordinates();
-		this.addActionListener(this);
-	}
-	
-	public void assignButtonValue() {
-		if (x == 0 || x == 1) {
-			setText("O");			
-		}
-		else if (x == 7 || x == 6)	{
-			setText("X");
-		}
-	}
-	
-	public void setCoordinates()	{
-		String message = "(" + x + ", " + y + ")";
-		setToolTipText(message);
-	}
-	
-	public String getCoordinates() {
-		String coordinates = "(" + x + "," + y + ")";
-		return coordinates;
-	}
-	
-	public void makeMove(int x, int y) {		
-		if(Breakthrough.buttonValue.equals("X"))
-		{
-			if(this.x == (x - 1)) { //this line checks for forward movement
-				if ((this.y == (y - 1)) || (this.y == y) || (this.y == (y + 1)) ) { //this line checks for diagonal forward movement
-					if (Breakthrough.buttons[(this.x + 1)][(this.y - 1)].getText().equals("O") || Breakthrough.buttons[(this.x + 1)][(this.y + 1)].getText().equals("O")) { //this line checks if diagonal has value
+   
+      public Button(int row, int col) {
+         x = row;
+         y = col;
+         assignButtonValue();
+         setCoordinates();
+         this.addActionListener(this);
+      }
+      
+      public void assignButtonValue() {
+         if (x == 0 || x == 1) {
+            setText("O");        
+         }
+         else if (x == 7 || x == 6) {
+            setText("X");
+         }
+      }
+      
+      public void setCoordinates()  {
+         String message = "(" + x + ", " + y + ")";
+         setToolTipText(message);
+      }
+      
+      public String getCoordinates() {
+         String coordinates = "(" + x + "," + y + ")";
+         return coordinates;
+      }
+      
+      public void makeMove(int x, int y) {
+         //x and y  are old coordinates
+         //this.x and this.y are the new coordinates
+         if (isValidMove(x, y)) {								
+					buttons[x][y].setText(""); 
+					buttons[this.x][this.y].setText(buttonValue);				
+         }		    
+      }
+      
+      public boolean isValidMove(int x, int y) {
+			if (buttonValue.equals("O")) {			
+				if(this.x == (x + 1)) {
+					if ((this.y == (y - 1)) || (this.y == (y + 1)) ) {
+	            	if(buttons[this.x][this.y].getText().equals("")) {	
+							playerTurn = 2;
+							player.setText("Player 2's Turn");				
+			            return true;	            
+						}
+						else if (buttons[this.x][this.y].getText().equals("X")) {
+							p1++;
+							p1Score.setText("Player 1: " + Integer.toString(p1));
+							playerTurn = 2;
+							player.setText("Player 2's Turn");
+							return true;
+						}
+				      else {
+				         JOptionPane.showMessageDialog(null, "That unit space is occupied");
+							return false;
+				      }
+	            }
+					else if (this.y == y) {
+						if(buttons[this.x][this.y].getText().equals("")) {		
+							playerTurn = 2;
+							player.setText("Player 2's Turn");			
+			            return true;	            
+						}
+				      else {
+				         JOptionPane.showMessageDialog(null, "You are blocked. Cannot move forward");
+							return false;
+				      }
 					}
-					else {					
-						Breakthrough.buttons[x][y].setText("");	// x and y are the old coordinates
-						Breakthrough.buttons[this.x][this.y].setText(Breakthrough.buttonValue);	//this.x and this.y are the new coordinates
+					else {
+	            	JOptionPane.showMessageDialog(null, "Not a valid move");
+						return false;
+	            }
+				}
+	         else {
+	               JOptionPane.showMessageDialog(null, "Not a valid move");
+						return false;
+	         } 
+			}  
+			else if (buttonValue.equals("X")) {
+				if(this.x == (x - 1)) {
+					if ((this.y == (y - 1)) || (this.y == (y + 1)) ) {
+	            	if(buttons[this.x][this.y].getText().equals("")) {	
+							playerTurn = 1;	
+							player.setText("Player 1's Turn");			
+			            return true;	            
+						}
+						else if (buttons[this.x][this.y].getText().equals("O")) {
+							p2++;
+							p2Score.setText("Player 2: " + Integer.toString(p2));
+							playerTurn = 1;
+							player.setText("Player 1's Turn");
+							return true;
+						}
+				      else {
+				         JOptionPane.showMessageDialog(null, "That unit space is occupied");
+							return false;
+				      }
+	            }
+					else if (this.y == y) {
+						if(buttons[this.x][this.y].getText().equals("")) {	
+							playerTurn = 1;
+							player.setText("Player 1's Turn");				
+			            return true;	            
+						}
+				      else {
+				         JOptionPane.showMessageDialog(null, "You are blocked. Cannot move forward");
+							return false;
+				      }
 					}
+					else {
+	            	JOptionPane.showMessageDialog(null, "Not a valid move");
+						return false;
+	            }
+				}
+	         else {
+	               JOptionPane.showMessageDialog(null, "Not a valid move");
+						return false;
+	         } 
+			}  
+			else {
+				return false;
+			}    
+      }		
+      		      
+      public void actionPerformed(ActionEvent ae)  {
+         if (ae.getActionCommand().equals("X") && counter == 0) {
+				if (playerTurn == 2) {				
+	            buttonValue = "X";
+	            buttonPressed = getCoordinates();
+	            counter++;
 				}
 				else {
-					JOptionPane.showMessageDialog(null, "You can only move forward or diagonal by one space");
+					JOptionPane.showMessageDialog(null, "It is not your turn");
 				}
-			}
-			else {
-				JOptionPane.showMessageDialog(null, "You can only move forward or diagonal by one space");
-			}
-		}
-		
-		else if(Breakthrough.buttonValue.equals("O"))
-		{
-			if(this.x == (x + 1)) {
-				if ((this.y == (y - 1)) || (this.y == y) || (this.y == (y + 1)) ) {
-					Breakthrough.buttons[x][y].setText("");	// x and y are the old coordinates
-					Breakthrough.buttons[this.x][this.y].setText(Breakthrough.buttonValue);	//this.x and this.y are the new coordinates
-				}
+         }
+			else if (ae.getActionCommand().equalsIgnoreCase("O") && counter == 0) {
+				if (playerTurn == 1) {
+	            buttonValue = "O";   
+	            buttonPressed = getCoordinates();
+	            counter++;  
+				} 
 				else {
-					JOptionPane.showMessageDialog(null, "You can only move forward or diagonal by one space");
+					JOptionPane.showMessageDialog(null, "It is not your turn");
 				}
-			}
-			else {
-				JOptionPane.showMessageDialog(null, "You can only move forward or diagonal by one space");
-			}
-		}
-
-	}
-	
-	public void actionPerformed(ActionEvent ae)	{
-		if (ae.getActionCommand().equals("X") && Breakthrough.counter == 0) {
-			Breakthrough.buttonValue = "X";
-			Breakthrough.buttonPressed = getCoordinates();
-			Breakthrough.counter++;
-		}
-		else if (ae.getActionCommand().equals("") && Breakthrough.counter == 1) {
-			int x = Integer.parseInt(Breakthrough.buttonPressed.substring(1,2));
-			int y = Integer.parseInt(Breakthrough.buttonPressed.substring(3,4));
-			makeMove(x,y);
-			Breakthrough.counter = 0;			
-		}
-		else if (ae.getActionCommand().equalsIgnoreCase("O") && Breakthrough.counter == 0) {
-			Breakthrough.buttonValue = "O";	
-			Breakthrough.buttonPressed = getCoordinates();
-			Breakthrough.counter++;		
-		}
-		else if (ae.getActionCommand().equals("") && Breakthrough.counter == 1) {
-			int x = Integer.parseInt(Breakthrough.buttonPressed.substring(1,2));
-			int y = Integer.parseInt(Breakthrough.buttonPressed.substring(3,4));
-			makeMove(x,y);
-			Breakthrough.counter = 0;			
-		}
-		
-		else if(ae.getActionCommand().equals("") && Breakthrough.counter == 0)
-		{
-			JOptionPane.showMessageDialog(null, "Error: You cannot move an empty space");
-		}
-		
-		else if( (ae.getActionCommand().equals("")) == false && Breakthrough.counter == 1)
-		{
-			JOptionPane.showMessageDialog(null, "Error: You can");
-		}
-		
-	}
-
+         }       
+         else if (counter == 1) {
+            int x = Integer.parseInt(buttonPressed.substring(1,2));
+            int y = Integer.parseInt(buttonPressed.substring(3,4));
+            makeMove(x,y);
+            counter = 0;         
+         }     
+         else if(ae.getActionCommand().equals("") && counter == 0) {
+            JOptionPane.showMessageDialog(null, "Cannot move an empty unit");
+         }           
+      }
+   }
 }
