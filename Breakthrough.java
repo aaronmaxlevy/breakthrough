@@ -6,7 +6,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 	JButton [][] buttons = new JButton[8][8]; 
-   int counter, p1, p2, playerTurn;
+   int counter, p1, p2, playerTurn, usableX, usableO;
    String buttonPressed, buttonValue;
    JPanel north, center, south;
    JLabel player, p1Score, p2Score;
@@ -19,8 +19,10 @@ public class Breakthrough extends JFrame implements ActionListener {
       p1 = 0;
       p2 = 0; 
 		playerTurn = 1; 
+		usableX = 16;
+		usableO = 16;
 		
-		//old idea JOptionPane.showMessageDialog(null, "Welcome! \nPlayer 1's units are unicorns. \nPlayer 2's units are dragons.");
+		//JOptionPane.showMessageDialog(null, "Welcome! \nPlayer 1's units are unicorns. \nPlayer 2's units are dragons.");
 		
       northPanel();
       centerPanel();
@@ -38,14 +40,13 @@ public class Breakthrough extends JFrame implements ActionListener {
    
    public void northPanel() {
       north = new JPanel();
-      player = new JLabel("Player 1's Turn");
+      player = new JLabel("Player O's Turn");
       north.add(player);
       add(north, BorderLayout.NORTH);
    }
    
    public void centerPanel()  {
       center = new JPanel(new GridLayout(8, 8));
-      //setLayout(new GridLayout(8, 8));
       
       for(int col = 0; col < 8; col++)
       {
@@ -63,10 +64,14 @@ public class Breakthrough extends JFrame implements ActionListener {
    
    public void southPanel() {
       south = new JPanel();
+		south.setLayout(new BoxLayout(south, BoxLayout.Y_AXIS));
 		
-      p1Score = new JLabel("Player 1: " + p1);
-      p2Score = new JLabel("Player 2: " + p2);
+      p1Score = new JLabel("Player O Captures: " + p1);
+      p2Score = new JLabel("Player X Captures: " + p2);
       
+		p1Score.setAlignmentX(Component.CENTER_ALIGNMENT);
+		p2Score.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
       south.add(p1Score);
       south.add(p2Score);
       
@@ -100,9 +105,11 @@ public class Breakthrough extends JFrame implements ActionListener {
    
 	public void actionPerformed(ActionEvent ae) {
 		if (ae.getSource() == rules) {
-			JOptionPane.showMessageDialog(null, "Rules: \n1. You are able to move diagonally forward by one unit space \n2. You are able to move horizontally forward by one unit space \n3. You may only capture an enemy unit if it is located diagonally forward \n4. You cannot move vertically or backwards \n5. Player with most captured units wins");
+			JOptionPane.showMessageDialog(null, "Rules: \n1. You are able to move diagonally forward by one unit space \n2. You are able to move horizontally forward by one unit space \n3. You may only capture an enemy unit if it is located diagonally forward \n4. You cannot move vertically or backwards \n5. Player who reaches other side first wins");
 		}
 		else if (ae.getSource() == newGame) {
+			this.setVisible(false);
+			new Breakthrough();
 		}
 	}
 	
@@ -111,11 +118,9 @@ public class Breakthrough extends JFrame implements ActionListener {
    }
 
    class Button extends JButton implements ActionListener {
-      /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	int x, y;
+
+		private static final long serialVersionUID = 1L;
+		int x, y;
    
       public Button(int row, int col) {
          x = row;
@@ -159,14 +164,14 @@ public class Breakthrough extends JFrame implements ActionListener {
 					if ((this.y == (y - 1)) || (this.y == (y + 1)) ) {
 	            	if(buttons[this.x][this.y].getText().equals("")) {	
 							playerTurn = 2;
-							player.setText("Player 2's Turn");				
+							player.setText("Player X's Turn");				
 			            return true;	            
 						}
 						else if (buttons[this.x][this.y].getText().equals("X")) {
 							p1++;
-							p1Score.setText("Player 1: " + Integer.toString(p1));
+							p1Score.setText("Player O Captures: " + Integer.toString(p1));
 							playerTurn = 2;
-							player.setText("Player 2's Turn");
+							player.setText("Player X's Turn");
 							return true;
 						}
 				      else {
@@ -177,7 +182,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 					else if (this.y == y) {
 						if(buttons[this.x][this.y].getText().equals("")) {		
 							playerTurn = 2;
-							player.setText("Player 2's Turn");			
+							player.setText("Player X's Turn");			
 			            return true;	            
 						}
 				      else {
@@ -200,14 +205,14 @@ public class Breakthrough extends JFrame implements ActionListener {
 					if ((this.y == (y - 1)) || (this.y == (y + 1)) ) {
 	            	if(buttons[this.x][this.y].getText().equals("")) {	
 							playerTurn = 1;	
-							player.setText("Player 1's Turn");			
+							player.setText("Player O's Turn");			
 			            return true;	            
 						}
 						else if (buttons[this.x][this.y].getText().equals("O")) {
 							p2++;
-							p2Score.setText("Player 2: " + Integer.toString(p2));
+							p2Score.setText("Player X Captures: " + Integer.toString(p2));
 							playerTurn = 1;
-							player.setText("Player 1's Turn");
+							player.setText("Player O's Turn");
 							return true;
 						}
 				      else {
@@ -218,7 +223,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 					else if (this.y == y) {
 						if(buttons[this.x][this.y].getText().equals("")) {	
 							playerTurn = 1;
-							player.setText("Player 1's Turn");				
+							player.setText("Player O's Turn");				
 			            return true;	            
 						}
 				      else {
@@ -240,7 +245,30 @@ public class Breakthrough extends JFrame implements ActionListener {
 				return false;
 			}    
       }		
-      		      
+		
+		public void isWinner() {
+			if (buttonValue.equals("O") && this.x == 7) {
+				JOptionPane.showMessageDialog(null, "Player O wins");
+				for(int col = 0; col < 8; col++)
+		     	{
+		         for(int row = 0; row < 8; row++)
+		    	   {			            
+				      buttons[row][col].setEnabled(false);   			
+			      }
+		    	}				
+			}
+			else if (buttonValue.equals("X") && this.x == 0) {
+				JOptionPane.showMessageDialog(null, "Player X wins");
+				for(int col = 0; col < 8; col++)
+		     	{
+		         for(int row = 0; row < 8; row++)
+		    	   {			            
+				      buttons[row][col].setEnabled(false);   			
+			      }
+		    	}
+			}
+		}
+		
       public void actionPerformed(ActionEvent ae)  {
          if (ae.getActionCommand().equals("X") && counter == 0) {
 				if (playerTurn == 2) {				
@@ -266,6 +294,7 @@ public class Breakthrough extends JFrame implements ActionListener {
             int x = Integer.parseInt(buttonPressed.substring(1,2));
             int y = Integer.parseInt(buttonPressed.substring(3,4));
             makeMove(x,y);
+				isWinner();
             counter = 0;         
          }     
          else if(ae.getActionCommand().equals("") && counter == 0) {
