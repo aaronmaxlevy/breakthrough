@@ -5,59 +5,150 @@
 *	
 *	Use GUI components to create a board game called Breakthrough. Made for two players
 **/
-
+import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Color;
+import java.io.*;
+import java.applet.*;
+import javax.sound.sampled.*;
 
 public class Breakthrough extends JFrame implements ActionListener {
 	
 	//Class Attributes
 	JButton [][] buttons = new JButton[8][8]; 
-   int counter, p1, p2, playerTurn;
+	JButton song1, song2;
+   int counter, p1, p2, playerTurn, usableP1, usableP2;
    String buttonPressed, buttonValue;
-   JPanel north, center, south;
+   JPanel north, center, south, south1, south2, north1, north2;
    JLabel player, p1Score, p2Score;
    JMenuBar menuBar;
    JMenu file, help;
    JMenuItem newGame, rules;
+	AudioClip ashKetch, pika, winner, bump;
+	Clip redBattle, elite4;
+	ImageIcon stop, play;
    
 	/**
-	*	Contructor for Breakthrough. 
-	*	Initialize some class attributes and create the GUI
+	*	Contructor for Breakthrough.
 	**/
    public Breakthrough() { 
-		//Initialize some attributes
-      counter = 0;
-      p1 = 0;
-      p2 = 0; 
-		playerTurn = 1; 
+		initialValues();
+
+		importMedia();	
 		
-		//Create GUI
-      northPanel();
-      centerPanel();
-      southPanel();
-      createMenu();
-      
 		//JFrame settings
 		setTitle("Best Game Ever");
       setVisible(true);
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       pack();
       setResizable(false); 
-      setLocationRelativeTo(null);
-   
+      setLocationRelativeTo(null);		
    }
+	
+	/**
+	*	Create the GUI and initialize values.
+	**/
+	public void initialValues() {
+		//Initialize some attributes
+      counter = 0;
+      p1 = 0;
+      p2 = 0; 
+		usableP1 = 16;
+		usableP2 = 16;
+		playerTurn = 1; 
+		
+		//Create GUI
+      northPanel();
+      centerPanel();
+      southPanel();
+      createMenu();					
+	}
    	
+	/**
+	* Import media files
+	**/
+	public void importMedia() {		
+		try {
+			//Use AudioInputStream to retrieve sound file for redBattle in order to adjust volume
+			AudioInputStream ais = AudioSystem.getAudioInputStream(new File("redBattle.wav"));
+			redBattle = AudioSystem.getClip();
+			redBattle.open(ais);
+			
+			FloatControl redBattleVolume = (FloatControl) redBattle.getControl(FloatControl.Type.MASTER_GAIN);
+			redBattleVolume.setValue(-15.0f); //Reduce volume
+			
+			AudioInputStream ais2 = AudioSystem.getAudioInputStream(new File("Elite4.wav"));
+			elite4 = AudioSystem.getClip();
+			elite4.open(ais2);
+			
+			FloatControl elite4Volume = (FloatControl) elite4.getControl(FloatControl.Type.MASTER_GAIN);
+			elite4Volume.setValue(-15.0f); //Reduce volume
+			
+			//Randomize which song starts first
+			double red = Math.random();
+			double elite = Math.random();
+			if (red > elite) {
+				redBattle.start();				
+			}
+			else {
+				elite4.start();
+				song2.setIcon(stop);
+				song1.setIcon(play);
+			}
+
+			//Get the other sound files			
+			bump = Applet.newAudioClip(new File("Bump.wav").toURL());
+			ashKetch = Applet.newAudioClip(new File("Ash.wav").toURL());
+			pika = Applet.newAudioClip(new File("Pikachu.wav").toURL());
+			winner = Applet.newAudioClip(new File("Winner.wav").toURL());			
+		}  
+	   catch(UnsupportedAudioFileException uafe)	{
+		 	uafe.printStackTrace();
+		} 
+		catch (IOException ioe) {
+			ioe.printStackTrace();
+		}
+		catch (LineUnavailableException lue) {
+			lue.printStackTrace();
+		}			
+	}
+		
 	/**
 	*	Create a northern panel which displays whose turn it is
 	**/
    public void northPanel() {
       north = new JPanel();
+		north.setLayout(new BoxLayout(north, BoxLayout.Y_AXIS));
+
+		north1 = new JPanel();
+		north2 = new JPanel();
+		
       player = new JLabel("Pikachu's Turn");
-      north.add(player);
+		north1.add(player);		
+		
+		stop = new ImageIcon("stop.png");
+		play = new ImageIcon("play.png");
+		
+		song1 = new JButton();
+		song1.setIcon(stop);
+		song2 = new JButton();
+		song2.setIcon(play);
+		
+		song1.addActionListener(this);
+		song2.addActionListener(this);
+		
+		north2.add(new JLabel("Song 1: "));
+		north2.add(song1);
+		north2.add(new JLabel("Song 2: "));
+		north2.add(song2);
+		
+      north.add(north1);
+		north.add(north2);
+		
       add(north, BorderLayout.NORTH);
+		
 		player.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
    }
    
@@ -97,7 +188,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 		else if ((col == 3 || col == 4) && (row == 0 || row == 7)) {
 			buttons[row][col].setBackground(Color.BLACK);
 		}
-		else if ((row == 4 || row == 5 || row == 6) && (col == 1 || col == 2 || col == 3 || col == 4 || col == 5 || col == 6) || (row == 3 && (col == 3 || col == 4))) {
+		else if ((row == 4 || row == 5) && (col == 1 || col == 2 || col == 3 || col == 4 || col == 5 || col == 6) || (row == 3 && (col == 3 || col == 4)) || (row == 6 && (col == 3 || col == 4))) {
 			buttons[row][col].setBackground(Color.WHITE);
 		}
 		else if ((row == 1 && (col == 3 || col == 4)) || (row == 2 && (col == 2 || col == 3 || col == 4 || col == 5)) || (row == 3 && (col == 1 || col == 2 || col == 5 || col == 6))) {
@@ -112,20 +203,22 @@ public class Breakthrough extends JFrame implements ActionListener {
       south = new JPanel();
 		south.setLayout(new BoxLayout(south, BoxLayout.Y_AXIS));
 		
+		south1 = new JPanel();
+		south2 = new JPanel();
+		
 		//Instantiate JLabels
       p1Score = new JLabel("Pikachu's captures: " + p1);
-      p2Score = new JLabel("Ash Ketchum's Captures: " + p2);
+      p2Score = new JLabel("Ash Ketchum's captures: " + p2);
 		
 		p1Score.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
 		p2Score.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
-      
-		//Center the components
-		p1Score.setAlignmentX(Component.CENTER_ALIGNMENT);
-		p2Score.setAlignmentX(Component.CENTER_ALIGNMENT);
+      		
+		south1.add(p1Score);
+		south2.add(p2Score);
 		
-      south.add(p1Score);
-      south.add(p2Score);
-      
+      south.add(south1);
+		south.add(south2);
+				      
       add(south, BorderLayout.SOUTH);      
    }
    
@@ -161,6 +254,29 @@ public class Breakthrough extends JFrame implements ActionListener {
 		newGame.addActionListener(this);
 		rules.addActionListener(this);
    }
+	
+	/**
+	*	Reset the game
+	**/
+	public void reset() {
+
+		double red = Math.random();
+		double elite = Math.random();
+		
+		//Randomize the start music
+		if (red > elite) {
+			redBattle.start();
+			song1.setIcon(stop);
+			song2.setIcon(play);
+		}
+		else {				
+			elite4.start();
+			song2.setIcon(stop);
+			song1.setIcon(play);
+		}
+		
+		initialValues();
+	}
    
 	/**
 	*	Action listener method
@@ -170,8 +286,37 @@ public class Breakthrough extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog(null, "Rules: \n1. You are able to move diagonally forward by one unit space \n2. You are able to move horizontally forward by one unit space \n3. You may only capture an enemy unit if it is located diagonally forward \n4. You cannot move vertically or backwards \n5. Player who reaches other side first wins");
 		}
 		else if (ae.getSource() == newGame) {
-			this.setVisible(false);
-			new Breakthrough();			//create a new game
+			redBattle.stop();
+			winner.stop();
+			elite4.stop();
+			getContentPane().removeAll();
+			reset();			
+			revalidate();
+			repaint();			
+		}
+		else if (ae.getSource() == song1) {
+			if (song1.getIcon() == stop) {
+				song1.setIcon(play);
+				redBattle.stop();
+			}
+			else {
+				song1.setIcon(stop);
+				song2.setIcon(play);
+				elite4.stop();
+				redBattle.start();
+			}
+		}
+		else if (ae.getSource() == song2) {
+			if (song2.getIcon() == stop) {
+				song2.setIcon(play);
+				elite4.stop();
+			}
+			else {
+				song2.setIcon(stop);
+				song1.setIcon(play);
+				redBattle.stop();
+				elite4.start();
+			}
 		}
 	}
 	
@@ -282,8 +427,11 @@ public class Breakthrough extends JFrame implements ActionListener {
 						//If diagonal space has an enemy unit then add one to capture points
 						//Return true and alternate player turn after capture
 						else if (buttons[this.row][this.col].getIcon() == ash) {
-							p1++;
-							p1Score.setText("Pikachu's captures: " + Integer.toString(p1));
+							p1++;							
+							usableP2--;							
+							pika.play();
+							south1.add(new JLabel(new ImageIcon("pokeball.png")), BorderLayout.NORTH);
+							p1Score.setText("Pikachu's captures: " + Integer.toString(p1));							
 							playerTurn = 2;
 							player.setText("Ash Ketchum's Turn");
 							return true;
@@ -291,6 +439,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 							
 						//Return false if the diagonal space has the current player's piece
 				      else {
+							bump.play();
 				         JOptionPane.showMessageDialog(null, "That unit space is occupied");
 							return false;
 				      }
@@ -309,7 +458,8 @@ public class Breakthrough extends JFrame implements ActionListener {
 						
 						//If not empty then return false
 				      else {
-				         JOptionPane.showMessageDialog(null, "You are blocked. Cannot move forward");
+							bump.play();
+				         JOptionPane.showMessageDialog(null, "You are blocked. Move elsewhere");
 							return false;
 				      }
 					}
@@ -344,6 +494,9 @@ public class Breakthrough extends JFrame implements ActionListener {
 						//Return true and alternate player turn after capture
 						else if (buttons[this.row][this.col].getIcon() == pikachu) {
 							p2++;
+							south2.add(new JLabel(new ImageIcon("pokeball.png")), BorderLayout.NORTH);
+							usableP1--;
+							ashKetch.play();
 							p2Score.setText("Ash Ketchum's captures: " + Integer.toString(p2));
 							playerTurn = 1;
 							player.setText("Pikachu's Turn");
@@ -352,6 +505,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 						
 						//Return false if the diagonal space has the current player's piece
 				      else {
+							bump.play();
 				         JOptionPane.showMessageDialog(null, "That unit space is occupied");
 							return false;
 				      }
@@ -370,7 +524,8 @@ public class Breakthrough extends JFrame implements ActionListener {
 						
 						//If not empty then return false
 				      else {
-				         JOptionPane.showMessageDialog(null, "You are blocked. Cannot move forward");
+							bump.play();
+				         JOptionPane.showMessageDialog(null, "You are blocked. Move elsewhere");
 							return false;
 				      }
 					}
@@ -395,9 +550,15 @@ public class Breakthrough extends JFrame implements ActionListener {
 		**/
 		public void isWinner() {
 			//Checks if player 1 has reached the end of the board on the other side
-			if (buttonValue.equals("pikachu") && this.col == 7) {
-				JOptionPane.showMessageDialog(null, "Pikachu wins");
-				
+			if (buttonValue.equals("pikachu") && this.col == 7) {				
+				elite4.stop();
+				redBattle.stop();
+				winner.play();
+				player.setText("Winner: Pikachu");
+				JOptionPane.showMessageDialog(null, "Pikachu wins!");
+								
+				song1.setEnabled(false);
+				song2.setEnabled(false);
 				//Iterate through entire 2D array and disable each button
 				for(int col = 0; col < 8; col++)
 		     	{
@@ -409,8 +570,14 @@ public class Breakthrough extends JFrame implements ActionListener {
 			}
 			//Checks if player 2 has reached the end of the board on the other side
 			else if (buttonValue.equals("ash") && this.col == 0) {
-				JOptionPane.showMessageDialog(null, "Ash Ketchum wins");
+				elite4.stop();
+				redBattle.stop();
+				winner.play();
+				player.setText("Winner: Ash Ketchum");
+				JOptionPane.showMessageDialog(null, "Ash Ketchum wins!");
 				
+				song1.setEnabled(false);
+				song2.setEnabled(false);
 				//Iterate through entire 2D array and disable each button
 				for(int col = 0; col < 8; col++)
 		     	{
@@ -420,13 +587,38 @@ public class Breakthrough extends JFrame implements ActionListener {
 			      }
 		    	}
 			}
-		}
+			else if (usableP1 == 0 || usableP2 == 0) {
+				if (usableP1 == 0) {
+					elite4.stop();
+					redBattle.stop();
+					winner.play();
+					player.setText("Winner: Ash Ketchum");
+					JOptionPane.showMessageDialog(null, "Pikachu has no more playable units. \nAsh Ketchum wins!");
+				}
+				else {
+					elite4.stop();
+					redBattle.stop();
+					winner.play();
+					player.setText("Winner: Pikachu");
+					JOptionPane.showMessageDialog(null, "Ash Ketchum has no more playable units. \nPikachu wins!");
+					
+				}
+				song1.setEnabled(false);
+				song2.setEnabled(false);
+				for(int col = 0; col < 8; col++)
+		     	{
+		         for(int row = 0; row < 8; row++)
+		    	   {			            
+				      buttons[row][col].setEnabled(false);   			
+			      }
+		    	}
+			}
+		} //End of isWinner()
 		
 		/**
 		*	Do these action(s) when a button is pressed	
 		**/
       public void actionPerformed(ActionEvent ae)  {
-		
 			//Check if button pressed is player 2 and if the counter is 0
 			//Counter is always zero on the first click on a player's turn
 			//A player must click two times
