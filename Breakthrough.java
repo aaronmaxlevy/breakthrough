@@ -173,7 +173,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 				//create an object of the inner Button class and add to 2D array list
 				buttons[row][col] = new Button(row, col);
            	center.add(buttons[row][col]);   
-				buttons[row][col].setPreferredSize(new Dimension(75,80)); 
+				buttons[row][col].setPreferredSize(new Dimension(70,60)); 
 				setColor(row, col);
          }
       }
