@@ -17,6 +17,11 @@ import javax.sound.sampled.*;
 
 public class Breakthrough extends JFrame implements ActionListener {
 	
+	/**
+	 * 
+	 */
+	//needed for Java compatibility
+	private static final long serialVersionUID = 1L;
 	//Class Attributes
 	JButton [][] buttons = new JButton[8][8]; 
 	JButton song1, song2;
@@ -345,6 +350,10 @@ public class Breakthrough extends JFrame implements ActionListener {
 	**/
    class Button extends JButton implements ActionListener {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
 		//class attributes
 		int row, col;
 		ImageIcon pikachu, ash;
