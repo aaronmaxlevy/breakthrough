@@ -5,6 +5,7 @@
 *	
 *	Use GUI components to create a board game called Breakthrough. Made for two players
 **/
+
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
@@ -71,7 +72,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 	**/
 	public void importMedia() {		
 		try {
-			//Use AudioInputStream to retrieve sound file for redBattle in order to adjust volume
+			//Use AudioInputStream to retrieve sound file for redBattle and Elite4 in order to adjust volume
 			AudioInputStream ais = AudioSystem.getAudioInputStream(new File("redBattle.wav"));
 			redBattle = AudioSystem.getClip();
 			redBattle.open(ais);
@@ -117,20 +118,24 @@ public class Breakthrough extends JFrame implements ActionListener {
 		
 	/**
 	*	Create a northern panel which displays whose turn it is
+	*	Also include options to play/stop the background music
 	**/
    public void northPanel() {
       north = new JPanel();
 		north.setLayout(new BoxLayout(north, BoxLayout.Y_AXIS));
-
+		
+		//These are two inner panels which will be put in the main north panel
 		north1 = new JPanel();
 		north2 = new JPanel();
 		
       player = new JLabel("Pikachu's Turn");
 		north1.add(player);		
 		
+		//Play and stop images
 		stop = new ImageIcon("stop.png");
 		play = new ImageIcon("play.png");
 		
+		//two buttons for play and stop
 		song1 = new JButton();
 		song1.setIcon(stop);
 		song2 = new JButton();
@@ -139,14 +144,17 @@ public class Breakthrough extends JFrame implements ActionListener {
 		song1.addActionListener(this);
 		song2.addActionListener(this);
 		
+		//add the buttons to the second panel
 		north2.add(new JLabel("Song 1: "));
 		north2.add(song1);
 		north2.add(new JLabel("Song 2: "));
 		north2.add(song2);
 		
+		//add both inner panels to the main north panel
       north.add(north1);
 		north.add(north2);
 		
+		//main north panel is added to JFrame
       add(north, BorderLayout.NORTH);
 		
 		player.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 24));
@@ -203,6 +211,7 @@ public class Breakthrough extends JFrame implements ActionListener {
       south = new JPanel();
 		south.setLayout(new BoxLayout(south, BoxLayout.Y_AXIS));
 		
+		//These are two inner south panels which are added to the main south panel
 		south1 = new JPanel();
 		south2 = new JPanel();
 		
@@ -212,10 +221,12 @@ public class Breakthrough extends JFrame implements ActionListener {
 		
 		p1Score.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
 		p2Score.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16));
-      		
+     	
+		//Add the JLabels to the inner south panels
 		south1.add(p1Score);
 		south2.add(p2Score);
 		
+		//Add the inner south panels to main south panel
       south.add(south1);
 		south.add(south2);
 				      
@@ -275,6 +286,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 			song1.setIcon(play);
 		}
 		
+		//This method will reset the necessary class attributes
 		initialValues();
 	}
    
@@ -289,11 +301,15 @@ public class Breakthrough extends JFrame implements ActionListener {
 			redBattle.stop();
 			winner.stop();
 			elite4.stop();
-			getContentPane().removeAll();
-			reset();			
-			revalidate();
+			getContentPane().removeAll();			//Remove eveything from JFrame
+			reset();										//Recreate everything
+			revalidate();								//Clean the JFrame
 			repaint();			
 		}
+		//These conditions will change the play and stop images
+		//respective to which button is pressed.
+		//It will also play or stop the song according to which
+		//button is pressed.
 		else if (ae.getSource() == song1) {
 			if (song1.getIcon() == stop) {
 				song1.setIcon(play);
