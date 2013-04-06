@@ -17,9 +17,6 @@ import javax.sound.sampled.*;
 
 public class Breakthrough extends JFrame implements ActionListener {
 
-	/**
-	 * 
-	 */
 	//needed for Java compatibility
 	private static final long serialVersionUID = 1L;
 	//Class Attributes
@@ -42,15 +39,15 @@ public class Breakthrough extends JFrame implements ActionListener {
 	public Breakthrough() { 
 		initialValues();
 
-		importMedia();	
-
 		//JFrame settings
 		setTitle("Best Game Ever");
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pack();
 		setResizable(false); 
-		setLocationRelativeTo(null);		
+		setLocationRelativeTo(null);	
+		
+		importMedia();		
 	}
 
 	/**
@@ -83,14 +80,14 @@ public class Breakthrough extends JFrame implements ActionListener {
 			redBattle.open(ais);
 
 			FloatControl redBattleVolume = (FloatControl) redBattle.getControl(FloatControl.Type.MASTER_GAIN);
-			redBattleVolume.setValue(-15.0f); //Reduce volume
+			redBattleVolume.setValue(-10.0f); //Reduce volume
 
 			AudioInputStream ais2 = AudioSystem.getAudioInputStream(new File("Elite4.wav"));
 			elite4 = AudioSystem.getClip();
 			elite4.open(ais2);
 
 			FloatControl elite4Volume = (FloatControl) elite4.getControl(FloatControl.Type.MASTER_GAIN);
-			elite4Volume.setValue(-15.0f); //Reduce volume
+			elite4Volume.setValue(-10.0f); //Reduce volume
 
 			//Randomize which song starts first
 			double red = Math.random();
@@ -293,7 +290,9 @@ public class Breakthrough extends JFrame implements ActionListener {
 	 *	Reset the game
 	 **/
 	public void reset() {
-
+		//This method will reset the necessary class attributes
+		initialValues();
+		
 		double red = Math.random();
 		double elite = Math.random();
 
@@ -308,9 +307,6 @@ public class Breakthrough extends JFrame implements ActionListener {
 			song2.setIcon(stop);
 			song1.setIcon(play);
 		}
-
-		//This method will reset the necessary class attributes
-		initialValues();
 	}
 
 	/**
@@ -326,7 +322,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 			elite4.stop();
 			getContentPane().removeAll();			//Remove eveything from JFrame
 			reset();										//Recreate everything
-			revalidate();								//Clean the JFrame
+			revalidate();								
 			repaint();			
 		}
 		//These conditions will change the play and stop images
