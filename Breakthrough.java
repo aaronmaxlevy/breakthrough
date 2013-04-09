@@ -76,16 +76,9 @@ public class Breakthrough extends JFrame implements ActionListener {
 			ashKetch = Applet.newAudioClip(new File("Ash.wav").toURL());
 			pika = Applet.newAudioClip(new File("Pikachu.wav").toURL());	
 		} 
-		/* 
-		catch(UnsupportedAudioFileException uafe)	{
-			uafe.printStackTrace();
-		}  */
 		catch (IOException ioe) {
 			ioe.printStackTrace();
-		}/*
-		catch (LineUnavailableException lue) {
-			lue.printStackTrace();
-		}		*/	
+		}
 	}
 
 	/**
