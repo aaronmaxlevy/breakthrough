@@ -29,7 +29,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 	JMenuBar menuBar;
 	JMenu file, help;
 	JMenuItem newGame, rules;
-	AudioClip ashKetch, pika, winner, bump;
+	AudioClip ashKetch, pika, winner, bump, redd, elitee;
 	Clip redBattle, elite4;
 	ImageIcon stop, play;
 
@@ -75,7 +75,8 @@ public class Breakthrough extends JFrame implements ActionListener {
 	public void importMedia() {		
 		try {
 			//Use AudioInputStream to retrieve sound file for redBattle and Elite4 in order to adjust volume
-			AudioInputStream ais = AudioSystem.getAudioInputStream(new File("redBattle.wav"));
+			/*
+			AudioInputStream ais = AudioSystem.getAudioInputStream(new File("RedBattle.wav"));
 			redBattle = AudioSystem.getClip();
 			redBattle.open(ais);
 
@@ -88,7 +89,7 @@ public class Breakthrough extends JFrame implements ActionListener {
 
 			FloatControl elite4Volume = (FloatControl) elite4.getControl(FloatControl.Type.MASTER_GAIN);
 			elite4Volume.setValue(-10.0f); //Reduce volume
-
+			
 			//Randomize which song starts first
 			double red = Math.random();
 			double elite = Math.random();
@@ -100,22 +101,36 @@ public class Breakthrough extends JFrame implements ActionListener {
 				song2.setIcon(stop);
 				song1.setIcon(play);
 			}
-
+			*/
 			//Get the other sound files			
 			bump = Applet.newAudioClip(new File("Bump.wav").toURL());
 			ashKetch = Applet.newAudioClip(new File("Ash.wav").toURL());
 			pika = Applet.newAudioClip(new File("Pikachu.wav").toURL());
-			winner = Applet.newAudioClip(new File("Winner.wav").toURL());			
-		}  
+			winner = Applet.newAudioClip(new File("Winner.wav").toURL());	
+			redd = Applet.newAudioClip(new File("RedBattle.wav").toURL());
+			elitee = Applet.newAudioClip(new File("Elite4.wav").toURL());	
+			
+			double red = Math.random();
+			double elite = Math.random();
+			if (red > elite) {
+				redd.play();				
+			}
+			else {
+				elitee.play();
+				song2.setIcon(stop);
+				song1.setIcon(play);
+			}	
+		} 
+		/* 
 		catch(UnsupportedAudioFileException uafe)	{
 			uafe.printStackTrace();
-		} 
+		}  */
 		catch (IOException ioe) {
 			ioe.printStackTrace();
-		}
+		}/*
 		catch (LineUnavailableException lue) {
 			lue.printStackTrace();
-		}			
+		}		*/	
 	}
 
 	/**
@@ -298,12 +313,14 @@ public class Breakthrough extends JFrame implements ActionListener {
 
 		//Randomize the start music
 		if (red > elite) {
-			redBattle.start();
+			//redBattle.start();
+			redd.play();
 			song1.setIcon(stop);
 			song2.setIcon(play);
 		}
 		else {				
-			elite4.start();
+			//elite4.start();
+			elitee.play();
 			song2.setIcon(stop);
 			song1.setIcon(play);
 		}
@@ -314,15 +331,15 @@ public class Breakthrough extends JFrame implements ActionListener {
 	 **/
 	public void actionPerformed(ActionEvent ae) {
 		if (ae.getSource() == rules) {
-			JOptionPane.showMessageDialog(null, "Rules: \n1. You are able to move diagonally forward by one unit space \n2. You are able to move horizontally forward by one unit space \n3. You may only capture an enemy unit if it is located diagonally forward \n4. You cannot move vertically or backwards \n5. Player who reaches other side first wins");
+			JOptionPane.showMessageDialog(null, "Rules: \n1. You are able to move diagonally forward by one unit space \n2. You are able to move horizontally forward by one unit space \n3. You may only capture an enemy unit if it is located diagonally forward \n4. You cannot move vertically or backwards \n5. Player who reaches other side first or captures all enemy units wins");
 		}
 		else if (ae.getSource() == newGame) {
-			redBattle.stop();
+			redd.stop();
 			winner.stop();
-			elite4.stop();
+			elitee.stop();
 			getContentPane().removeAll();			//Remove eveything from JFrame
 			reset();										//Recreate everything
-			revalidate();								
+			//revalidate();								
 			repaint();			
 		}
 		//These conditions will change the play and stop images
@@ -332,25 +349,25 @@ public class Breakthrough extends JFrame implements ActionListener {
 		else if (ae.getSource() == song1) {
 			if (song1.getIcon() == stop) {
 				song1.setIcon(play);
-				redBattle.stop();
+				redd.stop();
 			}
 			else {
 				song1.setIcon(stop);
 				song2.setIcon(play);
-				elite4.stop();
-				redBattle.start();
+				elitee.stop();
+				redd.play();
 			}
 		}
 		else if (ae.getSource() == song2) {
 			if (song2.getIcon() == stop) {
 				song2.setIcon(play);
-				elite4.stop();
+				elitee.stop();
 			}
 			else {
 				song2.setIcon(stop);
 				song1.setIcon(play);
-				redBattle.stop();
-				elite4.start();
+				redd.stop();
+				elitee.play();
 			}
 		}
 	}
@@ -590,8 +607,8 @@ public class Breakthrough extends JFrame implements ActionListener {
 		public void isWinner() {
 			//Checks if player 1 has reached the end of the board on the other side
 			if (buttonValue.equals("pikachu") && this.col == 7) {				
-				elite4.stop();
-				redBattle.stop();
+				elitee.stop();
+				redd.stop();
 				winner.play();
 				player.setText("Winner: Pikachu");
 				JOptionPane.showMessageDialog(null, "Pikachu wins!");
@@ -609,8 +626,8 @@ public class Breakthrough extends JFrame implements ActionListener {
 			}
 			//Checks if player 2 has reached the end of the board on the other side
 			else if (buttonValue.equals("ash") && this.col == 0) {
-				elite4.stop();
-				redBattle.stop();
+				elitee.stop();
+				redd.stop();
 				winner.play();
 				player.setText("Winner: Ash Ketchum");
 				JOptionPane.showMessageDialog(null, "Ash Ketchum wins!");
@@ -628,15 +645,15 @@ public class Breakthrough extends JFrame implements ActionListener {
 			}
 			else if (usableP1 == 0 || usableP2 == 0) {
 				if (usableP1 == 0) {
-					elite4.stop();
-					redBattle.stop();
+					elitee.stop();
+					redd.stop();
 					winner.play();
 					player.setText("Winner: Ash Ketchum");
 					JOptionPane.showMessageDialog(null, "Pikachu has no more playable units. \nAsh Ketchum wins!");
 				}
 				else {
-					elite4.stop();
-					redBattle.stop();
+					elitee.stop();
+					redd.stop();
 					winner.play();
 					player.setText("Winner: Pikachu");
 					JOptionPane.showMessageDialog(null, "Ash Ketchum has no more playable units. \nPikachu wins!");
